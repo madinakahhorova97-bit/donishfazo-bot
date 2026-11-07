@@ -4,7 +4,16 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
+# Ин ҷо одамон сабт мешаванд
+users = set()
+users_names = {}
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Сабт кардани истифодабаранда
+    user = update.message.from_user
+    users.add(user.id)
+    users_names[user.id] = user.first_name
+
     await update.message.reply_text("Салом! Хуш омадӣ ба Донишфазо! 🎉\n\nМан ёрдамчии ту дар математика ҳастам.")
     
     keyboard = [
@@ -17,6 +26,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("👇 Меню - Якеро интихоб кун:", reply_markup=reply_markup)
+
+async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    names = "\n".join([f"👤 {name}" for name in users_names.values()])
+    if not names:
+        names = "Ҳанӯз касе нест"
+    await update.message.reply_text(f"📊 Омори Донишфазо:\n\n👥 Ҳамагӣ: {len(users)} нафар\n\n{names}")
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -45,7 +60,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "books":
         await query.edit_message_text("📖 Китобҳо ба наздикӣ илова мешаванд!")
     elif data == "tables":
-        await query.edit_message_text("📊 Ҷадвалҳо:\n\n🔢 Ҷадвали зарб\n1x1=1, 2x2=4, 3x3=9, 4x4=16, 5x5=25\n\nБа наздикӣ ҷадвали пурра!")
+        await query.edit_message_text("📊 Ҷадвалҳо:\n\n🔢 Ҷадвали зарб\n1x1=1, 2x2=4, 3x3=9, 4x4=16, 5x5=25")
     elif data == "exercises":
         await query.edit_message_text("✍️ Машқҳои иловагӣ ба наздикӣ илова мешаванд!")
     elif data == "help":
@@ -61,6 +76,7 @@ def main():
     token = os.environ.get("BOT_TOKEN")
     app = Application.builder().token(token).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("stats", stats))
     app.add_handler(CallbackQueryHandler(button_handler))
     port = int(os.environ.get("PORT", 10000))
     server = HTTPServer(("0.0.0.0", port), BaseHTTPRequestHandler)
