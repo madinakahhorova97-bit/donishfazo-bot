@@ -5,7 +5,6 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-ADMIN_ID = 7823259268  # ID-и Мадина ✅
 USERS_FILE = "users.json"
 
 # Ин ҷо одамон сабт мешаванд
@@ -30,18 +29,13 @@ def save_users():
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Сабт кардани истифодабаранда
+    # Сабт кардани истифодабаранда - пинҳонӣ, ба касе хабар намеравад
     user = update.message.from_user
     is_new = user.id not in users
     users.add(user.id)
     users_names[user.id] = user.first_name
     if is_new:
         save_users()
-        # Хабар ба Мадина - чанд нафар шуд
-        try:
-            await context.bot.send_message(ADMIN_ID, f"🔔 Одами нав!\n👤 Ном: {user.first_name}\n👥 Ҳисобкунак: {len(users)} нафар шуд! 🎉")
-        except:
-            pass
 
     await update.message.reply_text("Салом! Хуш омадӣ ба Донишфазо! 🎉\n\nМан ёрдамчии ту дар математика ҳастам.")
     
@@ -54,7 +48,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
          InlineKeyboardButton("🆘 Ёрдам", callback_data="help")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(f"👇 Меню - Якеро интихоб кун:\n\n👥 Мо ҳозир {len(users)} нафар шудем!", reply_markup=reply_markup)
+    await update.message.reply_text("👇 Меню - Якеро интихоб кун:", reply_markup=reply_markup)
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     names = "\n".join([f"👤 {name}" for name in users_names.values()])
@@ -62,7 +56,7 @@ async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         names = "Ҳанӯз касе нест"
     await update.message.reply_text(f"📊 Омори Донишфазо:\n\n👥 Ҳамагӣ: {len(users)} нафар /start додаанд!\n\n{names}")
 
-# --- ҲИСОБКУНАКИ НАВ ---
+# --- ҲИСОБКУНАК - ФАҚАТ БАРОИ ТУ ---
 async def hisob(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"👥 Ҳозир дар боти ДонишФазо:\n\n🎉 {len(users)} нафар /start додаанд!")
 
