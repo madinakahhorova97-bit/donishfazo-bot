@@ -44,7 +44,7 @@ def ask_groq(question):
         return "Калиди AI ҳанӯз гузошта нашудааст. Ба муаллима бигӯ!"
     try:
         data = json.dumps({
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-20b",
             "messages": [
                 {"role": "system", "content": "Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Ҳамеша мисол овар."},
                 {"role": "user", "content": question}
