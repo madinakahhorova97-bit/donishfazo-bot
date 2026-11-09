@@ -59,8 +59,9 @@ def ask_groq(question):
         with urllib.request.urlopen(req, timeout=30) as r:
             res = json.loads(r.read().decode("utf-8"))
             return res["choices"][0]["message"]["content"]
-    except:
-        return "Бубахшед, ҳозир AI банд аст. Баъдтар боз савол диҳед! 🙏"
+        except Exception as e:
+        print(f"GROQ ХАТО: {e}")
+        return f"Хатои AI: {e}"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
