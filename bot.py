@@ -44,7 +44,7 @@ def ask_groq(question):
         return "Калиди AI ҳанӯз гузошта нашудааст. Ба муаллима бигӯ!"
     try:
         data = json.dumps({
-            "model": "openai/gpt-oss-20b",
+            "model": "llama-3.1-8b-instant",
             "messages": [
                 {"role": "system", "content": "Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Ҳамеша мисол овар."},
                 {"role": "user", "content": question}
@@ -59,7 +59,7 @@ def ask_groq(question):
         with urllib.request.urlopen(req, timeout=30) as r:
             res = json.loads(r.read().decode("utf-8"))
             return res["choices"][0]["message"]["content"]
-        except Exception as e:
+    except Exception as e:
         print(f"GROQ ХАТО: {e}")
         return f"Хатои AI: {e}"
 
