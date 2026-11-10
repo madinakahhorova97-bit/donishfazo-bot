@@ -46,7 +46,7 @@ def ask_gemini(question):
         data = json.dumps({
             "contents": [{"parts": [{"text": f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Ҳамеша мисол овар. Савол: {question}"}]}]
         }).encode("utf-8")
-        url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + api_key
+        url = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + api_key
         req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=30) as r:
             res = json.loads(r.read().decode("utf-8"))
