@@ -38,29 +38,21 @@ def main_menu():
         [InlineKeyboardButton("❓ Саволҳои иловагӣ (AI)", callback_data="ai_info")],
     ]
 
-def ask_groq(question):
-    api_key = os.environ.get("GROQ_API_KEY")
+def ask_gemini(question):
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return "Калиди AI ҳанӯз гузошта нашудааст. Ба муаллима бигӯ!"
     try:
         data = json.dumps({
-            "model": "openai/gpt-oss-20b",
-            "messages": [
-                {"role": "system", "content": "Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Ҳамеша мисол овар."},
-                {"role": "user", "content": question}
-            ],
-            "temperature": 0.7
+            "contents": [{"parts": [{"text": f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Ҳамеша мисол овар. Савол: {question}"}]}]
         }).encode("utf-8")
-        req = urllib.request.Request(
-            "https://api.groq.com/openai/v1/chat/completions",
-            data=data,
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-        )
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=30) as r:
             res = json.loads(r.read().decode("utf-8"))
-            return res["choices"][0]["message"]["content"]
+            return res["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
-        print(f"GROQ ХАТО: {e}")
+        print(f"GEMINI ХАТО: {e}")
         return f"Хатои AI: {e}"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -85,7 +77,7 @@ async def hisob(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     question = update.message.text
     await update.message.reply_text("Фикр мекунам... 🤔")
-    answer = ask_groq(question)
+    answer = ask_gemini(question)
     await update.message.reply_text(answer)
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
