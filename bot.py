@@ -42,18 +42,21 @@ def ask_gemini(question):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return "Калиди AI ҳанӯз гузошта нашудааст."
-    try:
-        data = json.dumps({
-            "contents": [{"parts": [{"text": f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Савол: {question}"}]}]
-        }).encode("utf-8")
-        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"
-        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json", "x-goog-api-key": api_key})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            res = json.loads(r.read().decode("utf-8"))
-            return res["candidates"][0]["content"]["parts"][0]["text"]
-    except Exception as e:
-        print(f"GEMINI ХАТО: {e}")
-        return f"Хатои AI: {e}"
+    models = ["gemini-2.0-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash"]
+    for model in models:
+        try:
+            data = json.dumps({
+                "contents": [{"parts": [{"text": f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Савол: {question}"}]}]
+            }).encode("utf-8")
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+            req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json", "x-goog-api-key": api_key})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                res = json.loads(r.read().decode("utf-8"))
+                return res["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e:
+            print(f"Модел {model} кор накард: {e}")
+            continue
+    return "Ҳозир AI банд аст, 1 дақиқа баъд боз кӯшиш кун."
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
