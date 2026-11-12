@@ -41,13 +41,13 @@ def main_menu():
 def ask_gemini(question):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        return "Калиди AI ҳанӯз гузошта нашудааст. Ба муаллима бигӯ!"
+        return "Калиди AI ҳанӯз гузошта нашудааст."
     try:
         data = json.dumps({
-            "contents": [{"parts": [{"text": f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Ҳамеша мисол овар. Савол: {question}"}]}]
+            "contents": [{"parts": [{"text": f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба хонандагони синфи 5 то 11 ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Савол: {question}"}]}]
         }).encode("utf-8")
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={api_key}"
-        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json", "x-goog-api-key": api_key})
         with urllib.request.urlopen(req, timeout=30) as r:
             res = json.loads(r.read().decode("utf-8"))
             return res["candidates"][0]["content"]["parts"][0]["text"]
