@@ -41,14 +41,15 @@ def main_menu():
 
 def ask_gemini(question):
     try:
-        prompt = f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Ба забони тоҷикӣ содда ва фаҳмо ҷавоб деҳ. Савол: {question}"
-        url = "https://text.pollinations.ai/" + urllib.parse.quote(prompt)
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            return r.read().decode("utf-8")
+        import google.generativeai as genai
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = f"Ту муаллими меҳрубон ва донои тоҷик ҳастӣ. Фақат бо забони тоҷикии содда, тоза ва дуруст ҷавоб деҳ. Забонҳоро омехта накун. Ҷавоб кӯтоҳ ва фаҳмо бошад. Савол: {question}"
+        resp = model.generate_content(prompt)
+        return resp.text
     except Exception as e:
-        print(f"ХАТО: {e}")
-        return "Ҳозир AI банд аст, боз кӯшиш кун."
+        print(f"Gemini хато: {e}")
+        return "Ҳозир AI банд аст, 1 дақиқа баъд боз кӯшиш кун. 🙏"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
